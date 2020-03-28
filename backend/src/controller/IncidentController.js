@@ -3,7 +3,6 @@ module.exports = {
     async index (request, response) {
         const {page = 1} = request.query;
         const [count] = await connection('incidents').count();
-        console.log(count);
 
         const incidents = await connection('incidents')
         .join('ongs', 'ongs.id', '=', 'incidents.ong_id')
@@ -41,6 +40,10 @@ module.exports = {
         .select('*')
         .where('id', id)
         .first();
+
+        if(incident == null){
+            return response.status(404).json({error:'incident not found'});
+        }
 
         if(incident.ong_id != logged_ong_id){
             return response.status(401).json({error:'operation not permitted'});
